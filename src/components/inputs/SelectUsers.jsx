@@ -3,10 +3,11 @@ import axiosInstance from '../../utils/axiosInstance';
 import { API_PATHS } from '../../utils/apiPaths';
 import { LuUsers } from "react-icons/lu";
 import Modal from '../Modal';
+import AvatarGroup from '../AvatarGroup';
 
 const SelectUsers = ({selectedUsers, setSelectedUsers}) => {
     const [allUsers, setAllUsers] = useState([]);
-    const [isModalOpen, setIsModalOpen] = useState(true);
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const [tempSelectedUsers, setTempSelectedUsers] = useState([]);
 
     const getAllUsers = async () => {
@@ -56,6 +57,12 @@ const SelectUsers = ({selectedUsers, setSelectedUsers}) => {
         </button>
       )}
 
+      {selectedUserAvatars.length > 0 && (
+        <div className='cursor-pointer' onClick={() => setIsModalOpen(true)}>
+            <AvatarGroup avatars={selectedUserAvatars} maxVisible={3} />
+        </div>
+      )}
+
       <Modal 
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -65,11 +72,11 @@ const SelectUsers = ({selectedUsers, setSelectedUsers}) => {
             {allUsers.map((user) => (
                 <div 
                 className='flex items-center gap-4 p-3 border-b border-gray-200 '
-                key={user.id}
+                key={user._id}
                 >
                     <img 
-                    src={user.profileImageUrl} 
-                    alt={user.name}
+                    src={user.profileImageUrl || "https://placehold.co/150x150?text=User"} 
+                    alt={user.name || "User"}
                     className='w-10 h-10 rounded-full'
                      />
 
@@ -96,7 +103,12 @@ const SelectUsers = ({selectedUsers, setSelectedUsers}) => {
             <button className='card-btn' onClick={() => setIsModalOpen(false)}>
                 CANCEL
             </button>
-            <button className='card-btn-fill' onClick={handleAssign}>
+            <button className='card-btn-fill' 
+            onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleAssign();
+            }}>
                 DONE
             </button>
         </div>

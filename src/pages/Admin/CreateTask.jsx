@@ -6,6 +6,8 @@ import toast from "react-hot-toast";
 import { PRIORITY_DATA } from "../../utils/data";
 import SelectDropdown from "../../components/inputs/SelectDropdown";
 import SelectUsers from "../../components/inputs/SelectUsers";
+import TodoListInput from "../../components/inputs/TodoListInput ";
+import AddAttachmentsInput from "../../components/inputs/AddAttachmentsInput";
 
 const CreateTask = () => {
   const navigate = useNavigate();
@@ -133,7 +135,7 @@ const CreateTask = () => {
                 <input
                   placeholder="Create App UI"
                   className="form-input"
-                  value={taskData.dueDate}
+                  value={taskData.dueDate ?? ""}
                   onChange={({ target }) =>
                     handleValueChange("dueDate", target.value)
                   }
@@ -148,9 +150,49 @@ const CreateTask = () => {
                 <SelectUsers
                   selectedUsers={taskData.assignedTo}
                   setSelectedUsers={(value) => {
-                    handleValueChange("assignedTo", target.value);
+                    handleValueChange("assignedTo", value);
                   }}
                 />
+              </div>
+            </div>
+
+            <div className="mt-3">
+              <label className="text-xs font-medium text-slate-600">
+                TODO Checklist 
+              </label>
+
+              <TodoListInput  
+                todoList={taskData?.todoChecklist}
+                setTodoList={(value) => 
+                  handleValueChange("todoChecklist", value)
+                }
+              />
+
+            <div className="mt-3">
+              <label className="text-xs font-medium text-slate-600">
+                Add Attachments 
+              </label>
+
+              <AddAttachmentsInput   
+                attachments={taskData?.attachments}
+                setAttachments={(value) => 
+                  handleValueChange("attachments", value)
+                }
+              />
+              </div>
+
+              {error && (
+                <p className="text-xs font-medium text-red-500 mt-5">{error}</p>
+              )}
+
+              <div className="flex justify-end mt-7">
+                <button 
+                  className="add-btn"
+                  //onClick={handleSubmit}
+                  disabled={loading}
+                >
+                  {taskId ? "UPDATE TASK" : "CREATE TASK"}
+                </button>
               </div>
             </div>
           </div>
