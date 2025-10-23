@@ -12,8 +12,11 @@ import { LuArrowRight } from "react-icons/lu";
 import TaskListTable from "../../components/layouts/TaskListTable";
 import CustomPieChart from "../../components/Charts/CustomPieChart";
 import CustomBarChart from "../../components/Charts/CustomBarChart";
+import { getGreeting } from "../../utils/getGreeting";
 
 const COLORS = ["#BD51FF", "#00BBDB", "#7BCE00"]
+
+// {{user?.name}}
 
 const Dashboard = () => {
   useUserAuth();
@@ -25,6 +28,10 @@ const Dashboard = () => {
   const [dashboardData, setDashboardData] = useState(null);
   const [pieChartData, setPieChartData] = useState(null);
   const [barChartData, setBarChartData] = useState(null);
+
+  //Greetings and mood
+  const moods = ["default", "work", "personal", "focused"];
+const randomMood = moods[Math.floor(Math.random() * moods.length)];
 
   //Prepare Chart Data
   const prepareChartData = (data) => {
@@ -77,7 +84,7 @@ const Dashboard = () => {
       <div className="card my-5">
         <div className="">
           <div className="col-span-3">
-            <h2 className="text-xl md:text-2xl">Good Morning! {user?.name}</h2>
+            <h2 className="text-xl md:text-2xl">{getGreeting(user, randomMood)}</h2>
             <p className="text-xs md:text-[13px] text-gray-400 mt-1.5">
               {moment().format("dddd Do MM YYYY")}
             </p>

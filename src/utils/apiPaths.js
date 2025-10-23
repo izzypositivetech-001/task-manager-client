@@ -5,6 +5,8 @@ export const API_PATHS = {
     AUTH: {
         REGISTER: "/api/auth/register", //register a new user (Admin or Member)
         LOGIN: "/api/auth/login", //Autheticate user & return JWT token
+    REFRESH: "/api/auth/refresh",
+    LOGOUT: "/api/auth/logout",
         GET_PROFILE: "/api/auth/profile", //Get logged-in user details
     },
 
@@ -31,10 +33,10 @@ export const API_PATHS = {
 
     REPORTS: {
         EXPORT_TASKS: "/api/reports/export/tasks", //Download all tasks as an exel/pdf report
-        EXPORT_TASKS: "/api/reports/export/users", //Download user-task report
+        EXPORT_USERS: "/api/reports/export/users", //Download user-task report
     },
 
     IMAGE: {
-        UPLOAD_IMAGE: "api/auth/upload-image",
+        UPLOAD_IMAGE: "/api/auth/upload-image",
     },
 }

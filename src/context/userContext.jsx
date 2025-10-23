@@ -12,7 +12,7 @@ const UserProvider = ({ children }) => {
     useEffect(() => {
         if(user) return;
 
-        const accessToken = localStorage.getItem("token");
+        const accessToken = localStorage.getItem("accessToken");
         if (!accessToken) {
             setLoading(false);
             return;
@@ -35,17 +35,32 @@ const UserProvider = ({ children }) => {
 
     const updateUser = (userData) => {
         setUser(userData);
-        localStorage.setItem("token", userData.token); //Save token
+        // store accessToken if provided on userData, otherwise don't overwrite
+        if (userData?.accessToken) {
+            localStorage.setItem("accessToken", userData.accessToken);
+        }
         setLoading(false)
     };
 
     const clearUser = () => {
         setUser(null);
-        localStorage.removeItem("token");
+        localStorage.removeItem("accessToken");
     };
 
+     const logoutUser = async () => {
+    try {
+      await axiosInstance.post(API_PATHS.AUTH.LOGOUT, {}, { withCredentials: true });
+    } catch (error) {
+      console.error("Logout error:", error.response?.data || error.message);
+    } finally {
+      localStorage.removeItem("accessToken");
+      setUser(null);
+      window.location.href = "/login";
+    }
+  };
+
     return (
-        <UserContext.Provider value={{ user, loading, updateUser, clearUser}}>
+        <UserContext.Provider value={{ user, loading, updateUser, clearUser, logoutUser}}>
             {children}
         </UserContext.Provider>
     );

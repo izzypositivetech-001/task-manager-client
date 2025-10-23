@@ -6,7 +6,7 @@ import toast from "react-hot-toast";
 import { PRIORITY_DATA } from "../../utils/data";
 import SelectDropdown from "../../components/inputs/SelectDropdown";
 import SelectUsers from "../../components/inputs/SelectUsers";
-import TodoListInput from "../../components/inputs/TodoListInput ";
+import TodoListInput from "../../components/inputs/TodoListInput";
 import AddAttachmentsInput from "../../components/inputs/AddAttachmentsInput";
 import axiosInstance from "../../utils/axiosInstance";
 import { API_PATHS } from "../../utils/apiPaths";

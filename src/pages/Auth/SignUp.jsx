@@ -60,25 +60,30 @@ const SignUp = () => {
         password,
         profileImageUrl,
         adminInviteToken,
-      });
+      },
+    { withCredentials: true }
+    );
 
       console.log("Signup response:", response);
 
 
-      const { token, role } = response.data;
+      const { accessToken, user } = response.data;
 
-      if (token) {
-        localStorage.setItem("token", token);
-        updateUser(response.data);
+    if (accessToken && user) {
+      // store under 'accessToken' for consistency
+      localStorage.setItem("accessToken", accessToken);
+        
+      updateUser({ ...user, accessToken});
 
         //Redirect based on role
-        if (role === "admin") {
+        if (user.role === "admin") {
           navigate("/admin/dashboard");
         } else {
           navigate("/user/dashboard");
         }
       }
     } catch (error) {
+      console.error("Signup error:", error);
       if (error.response && error.response.data.message) {
         setError(error.response.data.message);
       } else {
