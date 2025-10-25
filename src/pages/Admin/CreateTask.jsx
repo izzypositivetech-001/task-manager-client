@@ -157,7 +157,7 @@ const CreateTask = () => {
         setTaskData((prevState) => ({
           title: taskInfo.title,
           description: taskInfo.description,
-          priority: taskId.priority,
+          priority: taskInfo.priority,
           dueDate: taskInfo.dueDate
           ? moment(taskInfo.dueDate).format("YYYY-MM-DD")
           : null,

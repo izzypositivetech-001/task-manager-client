@@ -57,10 +57,7 @@ const ManageTasks = () => {
         return;
       }
 
-      console.log("Response received:", response);
-      console.log("Response data type:", response.data.type);
-      console.log("Response size:", response.data.size);
-
+    
       //Create a url for the blob
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement("a");

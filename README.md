@@ -1,16 +1,27 @@
-# React + Vite
+# TaskMaster Pro 
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**A lightweight, blazing-fast task manager built for developers, by developers.**  
+Track, prioritize, and crush your tasks — without the bloat.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
 
-## React Compiler
+- **Minimal & Clean UI** – No distractions. Just your tasks.
+- **Keyboard-First Navigation** – Move, edit, complete tasks with `Ctrl+K` shortcuts.
+- **Smart Filtering** – Filter by priority, status, due date, or custom tags.
+- **Markdown Task Notes** – Write rich notes with checklists, code blocks, and links.
+- **Local-First Storage** – Your data stays on your machine (`tasks.json`).
+- **Dark Mode + Themes** – Easy on the eyes, day or night.
+- **Export/Import** – Backup or migrate tasks in JSON or Markdown.
+- **VS Code Integration** *(optional)* – Track time spent on tasks via [Code Time](https://marketplace.visualstudio.com/items?itemName=softwaredotcom.swdc-vscode) or [WakaTime](https://wakatime.com/vs-code).
 
-The React Compiler is not enabled on this template. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## Quick Start
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### 1. Clone & Install
+```bash
+git clone 
+cd taskmaster-pro
+npm install

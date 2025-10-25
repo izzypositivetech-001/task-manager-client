@@ -5,7 +5,7 @@ import { LuUsers } from "react-icons/lu";
 import Modal from '../Modal';
 import AvatarGroup from '../AvatarGroup';
 
-const SelectUsers = ({selectedUsers, setSelectedUsers}) => {
+const SelectUsers = ({ selectedUsers = [], setSelectedUsers }) => {
     const [allUsers, setAllUsers] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [tempSelectedUsers, setTempSelectedUsers] = useState([]);
@@ -14,7 +14,7 @@ const SelectUsers = ({selectedUsers, setSelectedUsers}) => {
         try {
             const response = await axiosInstance.get(API_PATHS.USERS.GET_ALL_USERS);
             if (response.data?.length > 0) {
-                setAllUsers(response.data)
+                setAllUsers(response.data);
             }
         } catch (error) {
             console.error("Error fetching users", error);
@@ -22,99 +22,95 @@ const SelectUsers = ({selectedUsers, setSelectedUsers}) => {
     };
 
     const toggleUserSelection = (userId) => {
-        setTempSelectedUsers((prev) => 
-            prev.includes(userId)
-            ?prev.filter((id) => id !== userId)
-            :[...prev, userId]
-        )
+        setTempSelectedUsers((prev) =>
+            prev.includes(userId) ? prev.filter((id) => id !== userId) : [...prev, userId]
+        );
     };
 
     const handleAssign = () => {
         setSelectedUsers(tempSelectedUsers);
-        setIsModalOpen(false)
+        setIsModalOpen(false);
     };
 
     const selectedUserAvatars = allUsers
-    .filter((user) => selectedUsers.includes(user._id))
-    .map((user) => user.profileImageUrl);
+        .filter((user) => (Array.isArray(selectedUsers) ? selectedUsers.includes(user._id) : false))
+        .map((user) => user.profileImageUrl);
 
     useEffect(() => {
         getAllUsers();
     }, []);
 
+    // Initialize temporary selection when modal opens
     useEffect(() => {
-        if (selectedUsers.length === 0) {
+        if (isModalOpen) {
+            setTempSelectedUsers(Array.isArray(selectedUsers) ? selectedUsers : []);
+        }
+    }, [isModalOpen, selectedUsers]);
+
+    // Keep temp selection empty when there are no selected users
+    useEffect(() => {
+        if (!Array.isArray(selectedUsers) || selectedUsers.length === 0) {
             setTempSelectedUsers([]);
         }
+    }, [selectedUsers]);
 
-        return () => {};
-    }, [selectedUsers])
-  return (
-    <div className='space-y-4 mt-2'>
-      {selectedUserAvatars.length === 0 && (
-        <button className='card-btn' onClick={() => setIsModalOpen(true)}>
-            <LuUsers className="text-sm" /> Add Member
-        </button>
-      )}
+    return (
+        <div className='space-y-4 mt-2'>
+            {selectedUserAvatars.length === 0 && (
+                <button className='card-btn' onClick={() => setIsModalOpen(true)}>
+                    <LuUsers className='text-sm' /> Add Member
+                </button>
+            )}
 
-      {selectedUserAvatars.length > 0 && (
-        <div className='cursor-pointer' onClick={() => setIsModalOpen(true)}>
-            <AvatarGroup avatars={selectedUserAvatars} maxVisible={3} />
-        </div>
-      )}
-
-      <Modal 
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        title="Select Users"
-      >
-        <div className='space-y-4 h-[60vh] overflow-y-auto'>
-            {allUsers.map((user) => (
-                <div 
-                className='flex items-center gap-4 p-3 border-b border-gray-200 '
-                key={user._id}
-                >
-                    <img 
-                    src={user.profileImageUrl || "https://placehold.co/150x150?text=User"} 
-                    alt={user.name || "User"}
-                    className='w-10 h-10 rounded-full'
-                     />
-
-                     <div className='flex-1'>
-                        <p className='font-medium text-gray-800 dark:text-white'>
-                            {user.name}
-                        </p>
-                        <p className='text-[13px] text-gray-500'>
-                            {user.email}
-                        </p>
-                     </div>  
-
-                     <input 
-                        type='checkbox'
-                        checked={tempSelectedUsers.includes(user._id)}
-                        onChange={() => toggleUserSelection(user._id)}
-                        className='w-4 h-4 text-primary bg-gray-100 border-gray-300 rounded-sm outline-none'
-                     />
+            {selectedUserAvatars.length > 0 && (
+                <div className='cursor-pointer' onClick={() => setIsModalOpen(true)}>
+                    <AvatarGroup avatars={selectedUserAvatars} maxVisible={3} />
                 </div>
-            ))}
-        </div>
+            )}
 
-        <div className='flex justify-end gap-4 pt-4'>
-            <button className='card-btn' onClick={() => setIsModalOpen(false)}>
-                CANCEL
-            </button>
-            <button className='card-btn-fill' 
-            onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                handleAssign();
-            }}>
-                DONE
-            </button>
-        </div>
-      </Modal>
-    </div>
-  )
-}
+            <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title='Select Users'>
+                <div className='space-y-4 h-[60vh] overflow-y-auto'>
+                    {allUsers.map((user) => (
+                        <div className='flex items-center gap-4 p-3 border-b border-gray-200 ' key={user._id}>
+                            <img
+                                src={user.profileImageUrl || 'https://placehold.co/150x150?text=User'}
+                                alt={user.name || 'User'}
+                                className='w-10 h-10 rounded-full'
+                            />
 
-export default SelectUsers
+                            <div className='flex-1'>
+                                <p className='font-medium text-gray-800 dark:text-white'>{user.name}</p>
+                                <p className='text-[13px] text-gray-500'>{user.email}</p>
+                            </div>
+
+                            <input
+                                type='checkbox'
+                                checked={tempSelectedUsers.includes(user._id)}
+                                onChange={() => toggleUserSelection(user._id)}
+                                className='w-4 h-4 text-primary bg-gray-100 border-gray-300 rounded-sm outline-none'
+                            />
+                        </div>
+                    ))}
+                </div>
+
+                <div className='flex justify-end gap-4 pt-4'>
+                    <button className='card-btn' onClick={() => setIsModalOpen(false)}>
+                        CANCEL
+                    </button>
+                    <button
+                        className='card-btn-fill'
+                        onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleAssign();
+                        }}
+                    >
+                        DONE
+                    </button>
+                </div>
+            </Modal>
+        </div>
+    );
+};
+
+export default SelectUsers;
