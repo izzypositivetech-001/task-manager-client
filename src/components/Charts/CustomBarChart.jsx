@@ -19,7 +19,7 @@ const CustomBarChart = ({data}) => {
             case 'Low': 
             return '#00BC7D'
 
-            case 'Low':
+            case 'Medium':
                 return '#FE9900'
 
                 case 'High':
