@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import axiosInstance from "../../utils/axiosInstance";
 import { API_PATHS } from "../../utils/apiPaths";
@@ -6,6 +6,20 @@ import DashboardLayout from "../../components/layouts/DashboardLayout";
 import moment from "moment";
 import AvatarGroup from "../../components/AvatarGroup";
 import { LuSquareArrowOutUpRight } from "react-icons/lu";
+
+// keep this pure and out of the component so it's not re-created on every render
+const getStatusTagColor = (status) => {
+  switch (status) {
+    case "In Progress":
+      return "text-cyan-500 bg-cyan-50 border border-cyan-500/10";
+
+    case "Completed":
+      return "text-lime-500 bg-lime-50 border border-lime-500/20";
+
+    default:
+      return "text-violet-500 bg-violet-50 border border-violet-500/10";
+  }
+};
 
 const ViewTaskDetails = () => {
   const { id } = useParams();
@@ -24,8 +38,8 @@ const ViewTaskDetails = () => {
     }
   };
 
-  //get Task info by ID
-  const getTaskDetailsByID = async () => {
+  // get Task info by ID (stable reference)
+  const getTaskDetailsByID = useCallback(async () => {
     try {
       const response = await axiosInstance.get(
         API_PATHS.TASKS.GET_ALL_TASK_BY_ID(id)
@@ -38,10 +52,10 @@ const ViewTaskDetails = () => {
     } catch (error) {
       console.error("Error fetching users:", error);
     }
-  };
+  }, [id]);
 
-  //handle todo check
-  const updateTodoCheckList = async (index) => {
+  //handle todo check (stable reference)
+  const updateTodoCheckList = useCallback(async (index) => {
     const todoChecklist = [...task?.todoChecklist];
     const taskId = id;
 
@@ -54,24 +68,30 @@ const ViewTaskDetails = () => {
           { todoChecklist }
         );
         if (response.status === 200) {
-          setTask(response.data?.task || task)
+          setTask(response.data?.task || task);
         } else {
           //Optionally revert the toggle if the API call fails.
           todoChecklist[index].completed = !todoChecklist[index].completed;
         }
       } catch (error) {
-        todoChecklist[index].completed = todoChecklist[index].completed;
+        // revert on error
+        todoChecklist[index].completed = !todoChecklist[index].completed;
       }
     }
-  };
+  }, [task, id]);
 
-  //Handle attachment link click
-  const handleLinkClick = (link) => {
+  //Handle attachment link click (stable reference)
+  const handleLinkClick = useCallback((link) => {
     if (!/^https?:\/\//i.test(link)) {
-      link = "https://" + link  //Default to HTTPS
+      link = "https://" + link; //Default to HTTPS
     }
     window.open(link, "_blank");
-  };
+  }, []);
+
+  // memoize derived arrays so children receive stable references
+  const avatarUrls = useMemo(() => {
+    return task?.assignedTo?.map((item) => item?.profileImageUrl) || [];
+  }, [task?.assignedTo]);
 
   useEffect(() => {
     if (id) {
@@ -125,14 +145,7 @@ const ViewTaskDetails = () => {
                       Assigned To
                     </label>
 
-                    <AvatarGroup
-                      avatars={
-                        task?.assignedTo?.map(
-                          (item) => item?.profileImageUrl
-                        ) || []
-                      }
-                      maxVisible={5}
-                    />
+                    <AvatarGroup avatars={avatarUrls} maxVisible={5} />
                   </div>
                 </div>
 
@@ -144,9 +157,10 @@ const ViewTaskDetails = () => {
                   {task?.todoChecklist?.map((item, index) => (
                     <TodoCheckList
                       key={`todo_${index}`}
+                      index={index}
                       text={item.text}
                       isChecked={item?.completed}
-                      onChange={() => updateTodoCheckList(index)}
+                      onChange={updateTodoCheckList}
                     />
                   ))}
                 </div>
@@ -158,10 +172,11 @@ const ViewTaskDetails = () => {
                     </label>
 
                     {task?.attachments?.map((link, index) => (
-                      <Attachment                        key={`link_${index}`}
+                      <Attachment
+                        key={`link_${index}`}
                         link={link}
                         index={index}
-                        onClick={() => handleLinkClick(link)}
+                        onClick={handleLinkClick}
                       />
                     ))}
                   </div>
@@ -177,7 +192,7 @@ const ViewTaskDetails = () => {
 
 export default ViewTaskDetails;
 
-const InfoBox = ({ label, value }) => {
+const InfoBox = React.memo(({ label, value }) => {
   return (
     <>
       <label className="text-xs font-medium text-slate-500">{label}</label>
@@ -187,26 +202,37 @@ const InfoBox = ({ label, value }) => {
       </p>
     </>
   );
-};
+});
 
-const TodoCheckList = ({ text, isChecked, onChange }) => {
+const TodoCheckList = React.memo(({ index, text, isChecked, onChange }) => {
+  const handleChange = useCallback(() => {
+    onChange(index);
+  }, [onChange, index]);
+
   return (
     <div className="flex items-center gap-3 p-3">
       <input
         type="checkbox"
         checked={isChecked}
-        onChange={onChange}
+        onChange={handleChange}
         className="w-4 h-4 text-primary bg-gray-100 border-gray-300 rounded-sm outline-none cursor-pointer"
       />
 
       <p className="text-[13px] text-gray-800">{text}</p>
     </div>
   );
-};
+});
 
-const Attachment = ({ link, index, onClick }) => {
+const Attachment = React.memo(({ link, index, onClick }) => {
+  const handleClick = useCallback(() => {
+    onClick(link);
+  }, [onClick, link]);
+
   return (
-    <div className="flex justify-between bg-gray-50 border-gray-100 px-3 py-2 rounded-md mb-3 mt-2 cursor-pointer" onClick={onClick}>
+    <div
+      className="flex justify-between bg-gray-50 border-gray-100 px-3 py-2 rounded-md mb-3 mt-2 cursor-pointer"
+      onClick={handleClick}
+    >
       <div className="flex-1 flex items-center gap-3">
         <span className="text-xs text-gray-400 font-semibold mr-2">{index < 9 ? `0${index + 1}` : index + 1}</span>
 
@@ -216,4 +242,4 @@ const Attachment = ({ link, index, onClick }) => {
       <LuSquareArrowOutUpRight className="text-gray-400" />
     </div>
   );
-};
+});
