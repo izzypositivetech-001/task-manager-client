@@ -1,6 +1,11 @@
 import axios from "axios";
 import { BASE_URL, API_PATHS } from "./apiPaths";
 
+export const api = axios.create({
+  baseURL: import.meta.env.VITE_API_BASE_URL,
+  withCredentials: true,
+});
+
 const axiosInstance = axios.create({
   baseURL: BASE_URL,
   timeout: 10000,
